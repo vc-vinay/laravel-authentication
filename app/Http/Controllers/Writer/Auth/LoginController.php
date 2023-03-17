@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Auth;
+namespace App\Http\Controllers\Writer\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class LoginController extends Controller
 {
@@ -28,7 +29,7 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = RouteServiceProvider::HOME;
+    protected $redirectTo = RouteServiceProvider::WRITER_HOME;
 
     /**
      * The maximum number of attempts allowed within the given number of minutes.
@@ -58,7 +59,7 @@ class LoginController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('guest')->except('logout');
+        $this->middleware('guest:writer')->except('logout');
         $this->username = $this->findUsername();
     }
 
@@ -70,7 +71,6 @@ class LoginController extends Controller
     public function findUsername()
     {
         $login = request()->input('login');
-        Auth::class;
  
         $fieldType = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
  
@@ -90,6 +90,17 @@ class LoginController extends Controller
     }
 
     /**
+     * Show the application's admin login form.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function showLoginForm()
+    {
+        return view('writer.auth.login');
+    }
+
+
+    /**
      * Log the user out of the application.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -103,6 +114,16 @@ class LoginController extends Controller
             return $response;
         }
 
-        return $this->loggedOut($request) ?: redirect(route('login'));
+        return $this->loggedOut($request) ?: redirect(route('writer.login'));
+    }
+
+    /**
+     * Get the guard to be used during authentication.
+     *
+     * @return \Illuminate\Contracts\Auth\StatefulGuard
+     */
+    protected function guard()
+    {
+        return Auth::guard('writer');
     }
 }
