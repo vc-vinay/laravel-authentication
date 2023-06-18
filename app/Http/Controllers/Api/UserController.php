@@ -4,9 +4,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Constant\Constant;
 use App\Http\Controllers\Controller;
+use App\QueryFilters\Active;
 use App\Http\Resources\UserCollection;
 use App\Models\User;
+use App\QueryFilters\Sort;
 use Illuminate\Http\Request;
+use Illuminate\Pipeline\Pipeline;
 
 class UserController extends Controller
 {
@@ -28,8 +31,16 @@ class UserController extends Controller
         return Constant::STATUS_TRUE;
     }
 
-    public function getUsers() {
-        $users = User::paginate(1); // Fetch users data
+    public function getUsers()
+    {
+        $users = app(Pipeline::class)
+            ->send(User::query())
+            ->through([
+                Active::class,
+                Sort::class,
+            ])
+            ->thenReturn()
+            ->paginate(5);
 
         return (new UserCollection($users))->additional([
             'status' => true,
