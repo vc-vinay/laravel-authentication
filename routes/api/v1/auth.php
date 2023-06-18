@@ -15,4 +15,5 @@ Route::middleware(['auth:sanctum'])->group( function() {
 
     Route::get('user', [UserController::class, 'getDetails']);
     Route::get('user/verified-at', [UserController::class, 'checkStatus']);
+    Route::get('users', [UserController::class, 'getUsers']);
 });
